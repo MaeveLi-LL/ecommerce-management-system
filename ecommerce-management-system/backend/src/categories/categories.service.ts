@@ -144,13 +144,12 @@ export class CategoriesService {
       throw new ConflictException('该分类下还有子分类，无法删除');
     }
 
-    // 检查是否有商品使用该分类
-    const productsCount = await this.prisma.product.count({
+    // 删除分类前，先将所有使用该分类的商品的 categoryId 设置为 null
+    // 这样商品就不会显示已删除的分类了
+    await this.prisma.product.updateMany({
       where: { categoryId: id },
+      data: { categoryId: null },
     });
-    if (productsCount > 0) {
-      throw new ConflictException('该分类下还有商品，无法删除');
-    }
 
     return this.prisma.category.delete({
       where: { id },

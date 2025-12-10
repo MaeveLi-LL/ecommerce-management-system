@@ -2,11 +2,64 @@
 
 .dashboard-layout {
   min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
-/* 左侧边栏，深色主题 */
+/* 左侧边栏，紫色渐变主题 */
 .dashboard-sider {
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(180deg, #667eea 0%, #764ba2 100%) !important;
+  overflow: hidden;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
+/* 拖拽调整条样式 */
+.sider-resizer {
+  transition: background-color 0.2s;
+}
+
+.sider-resizer:hover {
+  background-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 覆盖 Ant Design 默认的深色主题样式 */
+.dashboard-sider .ant-menu {
+  background: transparent !important;
+  border-right: none;
+}
+
+.dashboard-sider .ant-menu-item {
+  color: rgba(255, 255, 255, 0.85) !important;
+  margin: 8px 12px !important;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.dashboard-sider .ant-menu-item:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+}
+
+.dashboard-sider .ant-menu-item-selected {
+  background: rgba(255, 255, 255, 0.25) !important;
+  color: #fff !important;
+}
+
+.dashboard-sider .ant-menu-item-selected::after {
+  display: none;
+}
+
+.dashboard-sider .ant-menu-item-icon {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.dashboard-sider .ant-menu-item-selected .ant-menu-item-icon {
+  color: #fff;
 }
 
 /* Logo区域 */

@@ -18,7 +18,8 @@
 | updatedAt | DateTime | NOT NULL, AUTO UPDATE | 更新时间 |
 
 **关系**:
-- 一个用户可以有多个商品 (One-to-Many)
+- 一个用户可以有多个商品 (One-to-Many: Product)
+- 一个用户可以有多个分类 (One-to-Many: Category)
 
 ### 商品表 (products)
 
@@ -40,25 +41,31 @@
 
 **外键约束**:
 - `userId` → `users.id` (ON DELETE CASCADE)
-- `categoryId` → `categories.id`
+- `categoryId` → `categories.id` (ON DELETE SET NULL)
 
 ### 分类表 (categories)
 
 | 字段名 | 类型 | 约束 | 说明 |
 |--------|------|------|------|
 | id | Int | PRIMARY KEY, AUTO_INCREMENT | 分类ID |
-| name | String | UNIQUE, NOT NULL | 分类名称 |
+| name | String | NOT NULL | 分类名称 |
+| userId | Int | FOREIGN KEY, NOT NULL | 所属用户ID |
 | parentId | Int | FOREIGN KEY, NULL | 父分类ID（用于层级结构） |
 | createdAt | DateTime | NOT NULL, DEFAULT NOW() | 创建时间 |
 | updatedAt | DateTime | NOT NULL, AUTO UPDATE | 更新时间 |
 
 **关系**:
+- 属于一个用户 (Many-to-One: User)
 - 可以有多个子分类 (One-to-Many: self-referencing)
 - 可以有一个父分类 (Many-to-One: self-referencing, nullable)
 - 可以有多个商品 (One-to-Many: Product)
 
 **外键约束**:
+- `userId` → `users.id` (ON DELETE CASCADE)
 - `parentId` → `categories.id` (自引用)
+
+**唯一约束**:
+- `(name, userId)` - 同一用户下分类名称唯一
 
 ## ER 图
 
@@ -113,9 +120,11 @@
 
 - `users.username`: UNIQUE INDEX
 - `users.email`: UNIQUE INDEX
-- `categories.name`: UNIQUE INDEX
+- `categories.name, categories.userId`: UNIQUE INDEX (复合唯一索引)
 - `products.userId`: INDEX (用于快速查询用户的商品)
 - `products.categoryId`: INDEX (用于快速查询分类下的商品)
+- `categories.userId`: INDEX (用于快速查询用户的分类)
+- `categories.parentId`: INDEX (用于快速查询子分类)
 
 ## 数据迁移
 

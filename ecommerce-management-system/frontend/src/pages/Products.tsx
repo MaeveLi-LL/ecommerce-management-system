@@ -25,7 +25,9 @@ const Products = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const [detailModalVisible, setDetailModalVisible] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [detailProduct, setDetailProduct] = useState<Product | null>(null);
   const [form] = Form.useForm();
 
   // 从后端获取商品列表
@@ -38,6 +40,17 @@ const Products = () => {
       message.error('获取商品列表失败');
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 获取商品详情
+  const fetchProductDetail = async (id: number) => {
+    try {
+      const response = await api.get(`/products/${id}`);
+      setDetailProduct(response.data);
+      setDetailModalVisible(true);
+    } catch (error: any) {
+      message.error('获取商品详情失败');
     }
   };
 
@@ -119,6 +132,15 @@ const Products = () => {
       title: '商品名称',
       dataIndex: 'name',
       key: 'name',
+      render: (name: string, record: Product) => (
+        <Button
+          type="link"
+          onClick={() => fetchProductDetail(record.id)}
+          style={{ padding: 0, fontWeight: 500 }}
+        >
+          {name}
+        </Button>
+      ),
     },
     {
       title: '描述',
@@ -272,6 +294,87 @@ const Products = () => {
             </Select>
           </Form.Item>
         </Form>
+      </Modal>
+
+      {/* 商品详情弹窗 */}
+      <Modal
+        title="商品详情"
+        open={detailModalVisible}
+        onCancel={() => {
+          setDetailModalVisible(false);
+          setDetailProduct(null);
+        }}
+        footer={[
+          <Button key="close" onClick={() => {
+            setDetailModalVisible(false);
+            setDetailProduct(null);
+          }}>
+            关闭
+          </Button>,
+          <Button
+            key="edit"
+            type="primary"
+            onClick={() => {
+              setDetailModalVisible(false);
+              if (detailProduct) {
+                handleOpenModal(detailProduct);
+              }
+            }}
+          >
+            编辑
+          </Button>,
+        ]}
+        width={600}
+        className="product-modal"
+      >
+        {detailProduct && (
+          <div style={{ padding: '20px 0' }}>
+            <div style={{ marginBottom: 16 }}>
+              <strong>商品ID：</strong>
+              <span>{detailProduct.id}</span>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <strong>商品名称：</strong>
+              <span>{detailProduct.name}</span>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <strong>商品描述：</strong>
+              <div style={{ marginTop: 8, color: '#666' }}>
+                {detailProduct.description || '暂无描述'}
+              </div>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <strong>价格：</strong>
+              <span className="price-text" style={{ fontSize: 18, marginLeft: 8 }}>
+                ¥{detailProduct.price.toFixed(2)}
+              </span>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <strong>库存：</strong>
+              <Tag color={detailProduct.stock > 0 ? 'green' : 'red'} style={{ marginLeft: 8 }}>
+                {detailProduct.stock}
+              </Tag>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <strong>分类：</strong>
+              <span style={{ marginLeft: 8 }}>
+                {detailProduct.category?.name || '未分类'}
+              </span>
+            </div>
+            <div style={{ marginBottom: 16 }}>
+              <strong>创建时间：</strong>
+              <span style={{ marginLeft: 8 }}>
+                {new Date(detailProduct.createdAt).toLocaleString('zh-CN')}
+              </span>
+            </div>
+            <div>
+              <strong>更新时间：</strong>
+              <span style={{ marginLeft: 8 }}>
+                {new Date(detailProduct.updatedAt).toLocaleString('zh-CN')}
+              </span>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );
