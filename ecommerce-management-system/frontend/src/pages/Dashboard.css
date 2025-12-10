@@ -4,6 +4,8 @@
   min-height: 100vh;
   height: 100vh;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 左侧边栏，紫色渐变主题 */
@@ -142,7 +144,29 @@
   margin: 24px 16px;
   padding: 24px;
   min-height: 280px;
+  max-height: calc(100vh - 112px); /* 减去 header 高度(64px) + margin(24px*2) */
+  overflow-y: auto; /* 允许垂直滚动 */
+  overflow-x: hidden; /* 隐藏水平滚动 */
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 自定义滚动条样式（可选，美化滚动条） */
+.dashboard-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dashboard-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.dashboard-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.dashboard-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
