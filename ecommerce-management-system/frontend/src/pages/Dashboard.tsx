@@ -74,7 +74,7 @@ const Dashboard = () => {
     {
       key: 'logout',
       icon: <LogoutOutlined />,
-      label: '退出登录',
+      label: 'Logout',
       onClick: () => {
         logout();
         navigate('/login');
@@ -86,13 +86,13 @@ const Dashboard = () => {
     {
       key: '1',
       icon: <ShoppingOutlined />,
-      label: '商品管理',
+      label: 'Product Management',
       onClick: () => navigate('/products'),
     },
     {
       key: '2',
       icon: <AppstoreOutlined />,
-      label: '分类管理',
+      label: 'Category Management',
       onClick: () => navigate('/categories'),
     },
   ];
@@ -125,7 +125,7 @@ const Dashboard = () => {
         >
           <div className="logo-container">
             <div className="logo-text">
-              {collapsed ? '电商' : '电商管理系统'}
+              {collapsed ? 'E-Commerce' : 'E-Commerce Management'}
             </div>
           </div>
           <Menu
@@ -169,7 +169,7 @@ const Dashboard = () => {
             className="collapse-button"
           />
           <Space className="user-info">
-            <span className="welcome-text">欢迎，{user?.username}</span>
+            <span className="welcome-text">Welcome, {user?.username}</span>
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
               <Avatar
                 className="user-avatar"

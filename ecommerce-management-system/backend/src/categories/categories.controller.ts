@@ -15,16 +15,16 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 
-@ApiTags('分类管理')
+@ApiTags('Category Management')
 @ApiBearerAuth('JWT-auth')
 @Controller('categories')
 @UseGuards(JwtAuthGuard)
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
-  @ApiOperation({ summary: '创建分类' })
-  @ApiResponse({ status: 201, description: '分类创建成功' })
-  @ApiResponse({ status: 409, description: '分类名称已存在' })
+  @ApiOperation({ summary: 'Create category' })
+  @ApiResponse({ status: 201, description: 'Category created successfully' })
+  @ApiResponse({ status: 409, description: 'Category name already exists' })
   @Post()
   create(@Request() req, @Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.create(
@@ -34,29 +34,29 @@ export class CategoriesController {
     );
   }
 
-  @ApiOperation({ summary: '获取分类列表' })
-  @ApiResponse({ status: 200, description: '返回当前用户的分类列表' })
+  @ApiOperation({ summary: 'Get category list' })
+  @ApiResponse({ status: 200, description: 'Returns current user\'s category list' })
   @Get()
   findAll(@Request() req) {
     return this.categoriesService.findAll(req.user.userId);
   }
 
-  @ApiOperation({ summary: '获取分类详情' })
-  @ApiParam({ name: 'id', description: '分类ID' })
-  @ApiResponse({ status: 200, description: '返回分类详情' })
-  @ApiResponse({ status: 404, description: '分类不存在' })
-  @ApiResponse({ status: 403, description: '无权访问此分类' })
+  @ApiOperation({ summary: 'Get category details' })
+  @ApiParam({ name: 'id', description: 'Category ID' })
+  @ApiResponse({ status: 200, description: 'Returns category details' })
+  @ApiResponse({ status: 404, description: 'Category not found' })
+  @ApiResponse({ status: 403, description: 'No permission to access this category' })
   @Get(':id')
   findOne(@Param('id') id: string, @Request() req) {
     return this.categoriesService.findOne(+id, req.user.userId);
   }
 
-  @ApiOperation({ summary: '更新分类信息' })
-  @ApiParam({ name: 'id', description: '分类ID' })
-  @ApiResponse({ status: 200, description: '分类更新成功' })
-  @ApiResponse({ status: 404, description: '分类不存在' })
-  @ApiResponse({ status: 403, description: '无权修改此分类' })
-  @ApiResponse({ status: 409, description: '分类名称已存在' })
+  @ApiOperation({ summary: 'Update category information' })
+  @ApiParam({ name: 'id', description: 'Category ID' })
+  @ApiResponse({ status: 200, description: 'Category updated successfully' })
+  @ApiResponse({ status: 404, description: 'Category not found' })
+  @ApiResponse({ status: 403, description: 'No permission to modify this category' })
+  @ApiResponse({ status: 409, description: 'Category name already exists' })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -71,12 +71,12 @@ export class CategoriesController {
     );
   }
 
-  @ApiOperation({ summary: '删除分类' })
-  @ApiParam({ name: 'id', description: '分类ID' })
-  @ApiResponse({ status: 200, description: '分类删除成功' })
-  @ApiResponse({ status: 404, description: '分类不存在' })
-  @ApiResponse({ status: 403, description: '无权删除此分类' })
-  @ApiResponse({ status: 409, description: '该分类下还有子分类或商品，无法删除' })
+  @ApiOperation({ summary: 'Delete category' })
+  @ApiParam({ name: 'id', description: 'Category ID' })
+  @ApiResponse({ status: 200, description: 'Category deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Category not found' })
+  @ApiResponse({ status: 403, description: 'No permission to delete this category' })
+  @ApiResponse({ status: 409, description: 'Cannot delete category with child categories or products' })
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req) {
     return this.categoriesService.remove(+id, req.user.userId);

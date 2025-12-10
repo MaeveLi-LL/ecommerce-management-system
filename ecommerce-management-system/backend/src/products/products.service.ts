@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
-  // 创建商品
+  // Create product
   async create(
     userId: number,
     name: string,
@@ -15,16 +15,16 @@ export class ProductsService {
     categoryId?: number,
     imageUrl?: string,
   ) {
-    // 如果指定了分类，检查分类是否属于当前用户
+    // If category is specified, check if it belongs to current user
     if (categoryId) {
       const category = await this.prisma.category.findUnique({
         where: { id: categoryId },
       });
       if (!category) {
-        throw new NotFoundException('分类不存在');
+        throw new NotFoundException('Category not found');
       }
       if (category.userId !== userId) {
-        throw new ForbiddenException('无权使用该分类');
+        throw new ForbiddenException('No permission to use this category');
       }
     }
 
@@ -51,7 +51,7 @@ export class ProductsService {
     });
   }
 
-  // 获取用户的所有商品
+  // Get all products for user
   async findAll(userId: number) {
     return this.prisma.product.findMany({
       where: { userId },
@@ -64,7 +64,7 @@ export class ProductsService {
     });
   }
 
-  // 获取单个商品
+  // Get single product
   async findOne(id: number) {
     const product = await this.prisma.product.findUnique({
       where: { id },
@@ -81,13 +81,13 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundException('商品不存在');
+      throw new NotFoundException('Product not found');
     }
 
     return product;
   }
 
-  // 更新商品
+  // Update product
   async update(
     id: number,
     userId: number,
@@ -100,21 +100,21 @@ export class ProductsService {
   ) {
     const product = await this.findOne(id);
 
-    // 检查商品是否属于当前用户
+    // Check if product belongs to current user
     if (product.userId !== userId) {
-      throw new ForbiddenException('无权修改此商品');
+      throw new ForbiddenException('No permission to modify this product');
     }
 
-    // 如果指定了新的分类，检查分类是否属于当前用户
+    // If new category is specified, check if it belongs to current user
     if (categoryId !== undefined && categoryId !== null) {
       const category = await this.prisma.category.findUnique({
         where: { id: categoryId },
       });
       if (!category) {
-        throw new NotFoundException('分类不存在');
+        throw new NotFoundException('Category not found');
       }
       if (category.userId !== userId) {
-        throw new ForbiddenException('无权使用该分类');
+        throw new ForbiddenException('No permission to use this category');
       }
     }
 
@@ -141,13 +141,13 @@ export class ProductsService {
     });
   }
 
-  // 删除商品
+  // Delete product
   async remove(id: number, userId: number) {
     const product = await this.findOne(id);
 
-    // 检查商品是否属于当前用户
+    // Check if product belongs to current user
     if (product.userId !== userId) {
-      throw new ForbiddenException('无权删除此商品');
+      throw new ForbiddenException('No permission to delete this product');
     }
 
     return this.prisma.product.delete({

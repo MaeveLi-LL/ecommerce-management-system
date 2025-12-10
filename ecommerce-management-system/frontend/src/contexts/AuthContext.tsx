@@ -57,9 +57,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       sessionStorage.setItem('token', access_token);
       sessionStorage.setItem('user', JSON.stringify(userData));
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      message.success('登录成功');
+      message.success('Login successful');
     } catch (error: any) {
-      message.error(error.response?.data?.message || '登录失败');
+      message.error(error.response?.data?.message || 'Login failed');
       throw error;
     }
   };
@@ -74,13 +74,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       const { access_token, user: userData } = response.data;
       setToken(access_token);
       setUser(userData);
-      // 使用 sessionStorage，这样新标签页需要重新登录
+      // Use sessionStorage so new tabs require re-login
       sessionStorage.setItem('token', access_token);
       sessionStorage.setItem('user', JSON.stringify(userData));
       api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
-      message.success('注册成功');
+      message.success('Registration successful');
     } catch (error: any) {
-      message.error(error.response?.data?.message || '注册失败');
+      message.error(error.response?.data?.message || 'Registration failed');
       throw error;
     }
   };
@@ -91,7 +91,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
     delete api.defaults.headers.common['Authorization'];
-    message.success('已退出登录');
+    message.success('Logged out successfully');
   };
 
   return (

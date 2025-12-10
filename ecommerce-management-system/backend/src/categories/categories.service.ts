@@ -5,9 +5,9 @@ import { PrismaService } from '../prisma/prisma.service';
 export class CategoriesService {
   constructor(private prisma: PrismaService) {}
 
-  // 创建分类
+  // Create category
   async create(userId: number, name: string, parentId?: number) {
-    // 检查该用户下分类名是否重复
+    // Check if category name already exists for this user
     const existing = await this.prisma.category.findFirst({
       where: {
         name,
@@ -16,19 +16,19 @@ export class CategoriesService {
     });
 
     if (existing) {
-      throw new ConflictException('分类名称已存在');
+      throw new ConflictException('Category name already exists');
     }
 
-    // 如果指定了父分类，检查父分类是否属于当前用户
+    // If parent category is specified, check if it belongs to current user
     if (parentId) {
       const parent = await this.prisma.category.findUnique({
         where: { id: parentId },
       });
       if (!parent) {
-        throw new NotFoundException('父分类不存在');
+        throw new NotFoundException('Parent category not found');
       }
       if (parent.userId !== userId) {
-        throw new ForbiddenException('无权使用该父分类');
+        throw new ForbiddenException('No permission to use this parent category');
       }
     }
 
@@ -45,7 +45,7 @@ export class CategoriesService {
     });
   }
 
-  // 获取当前用户的所有分类列表
+  // Get all categories for current user
   async findAll(userId: number) {
     return this.prisma.category.findMany({
       where: { userId },
@@ -62,7 +62,7 @@ export class CategoriesService {
     });
   }
 
-  // 根据ID查找单个分类
+  // Find single category by ID
   async findOne(id: number, userId?: number) {
     const category = await this.prisma.category.findUnique({
       where: { id },
@@ -74,22 +74,22 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new NotFoundException('分类不存在');
+      throw new NotFoundException('Category not found');
     }
 
-    // 如果提供了userId，检查分类是否属于该用户
+    // If userId is provided, check if category belongs to that user
     if (userId !== undefined && category.userId !== userId) {
-      throw new ForbiddenException('无权访问此分类');
+      throw new ForbiddenException('No permission to access this category');
     }
 
     return category;
   }
 
-  // 更新分类信息
+  // Update category information
   async update(id: number, userId: number, name?: string, parentId?: number | null) {
     const category = await this.findOne(id, userId);
 
-    // 如果要改名字，先检查新名字是否已经被该用户用了
+    // If changing name, check if new name is already used by this user
     if (name && name !== category.name) {
       const existing = await this.prisma.category.findFirst({
         where: {
@@ -98,24 +98,24 @@ export class CategoriesService {
         },
       });
       if (existing) {
-        throw new ConflictException('分类名称已存在');
+        throw new ConflictException('Category name already exists');
       }
     }
 
-    // 如果指定了父分类，检查父分类是否属于当前用户
+    // If parent category is specified, check if it belongs to current user
     if (parentId !== null && parentId !== undefined) {
       const parent = await this.prisma.category.findUnique({
         where: { id: parentId },
       });
       if (!parent) {
-        throw new NotFoundException('父分类不存在');
+        throw new NotFoundException('Parent category not found');
       }
       if (parent.userId !== userId) {
-        throw new ForbiddenException('无权使用该父分类');
+        throw new ForbiddenException('No permission to use this parent category');
       }
-      // 不能将分类设置为自己的子分类
+      // Cannot set category as its own parent
       if (parentId === id) {
-        throw new ConflictException('不能将分类设置为自己的父分类');
+        throw new ConflictException('Cannot set category as its own parent');
       }
     }
 
@@ -132,20 +132,20 @@ export class CategoriesService {
     });
   }
 
-  // 删除分类
+  // Delete category
   async remove(id: number, userId: number) {
     const category = await this.findOne(id, userId);
     
-    // 检查是否有子分类
+    // Check if there are child categories
     const childrenCount = await this.prisma.category.count({
       where: { parentId: id },
     });
     if (childrenCount > 0) {
-      throw new ConflictException('该分类下还有子分类，无法删除');
+      throw new ConflictException('Cannot delete category with child categories');
     }
 
-    // 删除分类前，先将所有使用该分类的商品的 categoryId 设置为 null
-    // 这样商品就不会显示已删除的分类了
+    // Before deleting category, set categoryId to null for all products using this category
+    // This way products won't show deleted category
     await this.prisma.product.updateMany({
       where: { categoryId: id },
       data: { categoryId: null },

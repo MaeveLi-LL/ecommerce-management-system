@@ -15,16 +15,16 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 
-@ApiTags('商品管理')
+@ApiTags('Product Management')
 @ApiBearerAuth('JWT-auth')
 @Controller('products')
 @UseGuards(JwtAuthGuard)
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  @ApiOperation({ summary: '创建商品' })
-  @ApiResponse({ status: 201, description: '商品创建成功' })
-  @ApiResponse({ status: 401, description: '未授权，需要登录' })
+  @ApiOperation({ summary: 'Create product' })
+  @ApiResponse({ status: 201, description: 'Product created successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized, login required' })
   @Post()
   create(@Request() req, @Body() createProductDto: CreateProductDto) {
     return this.productsService.create(
@@ -38,27 +38,27 @@ export class ProductsController {
     );
   }
 
-  @ApiOperation({ summary: '获取商品列表' })
-  @ApiResponse({ status: 200, description: '返回当前用户的商品列表' })
-  @ApiResponse({ status: 401, description: '未授权，需要登录' })
+  @ApiOperation({ summary: 'Get product list' })
+  @ApiResponse({ status: 200, description: 'Returns current user\'s product list' })
+  @ApiResponse({ status: 401, description: 'Unauthorized, login required' })
   @Get()
   findAll(@Request() req) {
     return this.productsService.findAll(req.user.userId);
   }
 
-  @ApiOperation({ summary: '获取商品详情' })
-  @ApiParam({ name: 'id', description: '商品ID' })
-  @ApiResponse({ status: 200, description: '返回商品详情' })
-  @ApiResponse({ status: 404, description: '商品不存在' })
+  @ApiOperation({ summary: 'Get product details' })
+  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiResponse({ status: 200, description: 'Returns product details' })
+  @ApiResponse({ status: 404, description: 'Product not found' })
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
   }
 
-  @ApiOperation({ summary: '更新商品信息' })
-  @ApiParam({ name: 'id', description: '商品ID' })
-  @ApiResponse({ status: 200, description: '商品更新成功' })
-  @ApiResponse({ status: 404, description: '商品不存在' })
+  @ApiOperation({ summary: 'Update product information' })
+  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiResponse({ status: 200, description: 'Product updated successfully' })
+  @ApiResponse({ status: 404, description: 'Product not found' })
   @Patch(':id')
   update(
     @Param('id') id: string,
@@ -77,10 +77,10 @@ export class ProductsController {
     );
   }
 
-  @ApiOperation({ summary: '删除商品' })
-  @ApiParam({ name: 'id', description: '商品ID' })
-  @ApiResponse({ status: 200, description: '商品删除成功' })
-  @ApiResponse({ status: 404, description: '商品不存在' })
+  @ApiOperation({ summary: 'Delete product' })
+  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiResponse({ status: 200, description: 'Product deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Product not found' })
   @Delete(':id')
   remove(@Param('id') id: string, @Request() req) {
     return this.productsService.remove(+id, req.user.userId);

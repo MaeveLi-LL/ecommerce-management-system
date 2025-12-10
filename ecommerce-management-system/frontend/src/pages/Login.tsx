@@ -21,7 +21,7 @@ const Login = () => {
     <div className="login-container">
       <div className="login-background">
         <div className="login-card-wrapper">
-          <Card className="login-card" title={<div className="login-title">欢迎登录</div>}>
+          <Card className="login-card" title={<div className="login-title">Welcome</div>}>
             <Form
               name="login"
               onFinish={onFinish}
@@ -30,36 +30,36 @@ const Login = () => {
               size="large"
             >
               <Form.Item
-                label="用户名"
+                label="Username"
                 name="username"
-                rules={[{ required: true, message: '请输入用户名' }]}
+                rules={[{ required: true, message: 'Please enter username' }]}
               >
                 <Input
                   prefix={<UserOutlined className="input-icon" />}
-                  placeholder="请输入用户名"
+                  placeholder="Enter username"
                 />
               </Form.Item>
 
               <Form.Item
-                label="密码"
+                label="Password"
                 name="password"
-                rules={[{ required: true, message: '请输入密码' }]}
+                rules={[{ required: true, message: 'Please enter password' }]}
               >
                 <Input.Password
                   prefix={<LockOutlined className="input-icon" />}
-                  placeholder="请输入密码"
+                  placeholder="Enter password"
                 />
               </Form.Item>
 
               <Form.Item>
                 <Button type="primary" htmlType="submit" block className="login-button">
-                  登录
+                  Login
                 </Button>
               </Form.Item>
 
               <Form.Item style={{ marginBottom: 0, textAlign: 'center' }}>
                 <Link to="/register" className="register-link">
-                  还没有账号？立即注册
+                  Don't have an account? Register now
                 </Link>
               </Form.Item>
             </Form>

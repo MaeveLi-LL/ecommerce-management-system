@@ -15,7 +15,7 @@ const Register = () => {
     confirmPassword: string;
   }) => {
     if (values.password !== values.confirmPassword) {
-      message.error('两次输入的密码不一致');
+      message.error('The two passwords do not match');
       return;
     }
 
@@ -31,7 +31,7 @@ const Register = () => {
     <div className="register-container">
       <div className="register-background">
         <div className="register-card-wrapper">
-          <Card className="register-card" title={<div className="register-title">创建账号</div>}>
+          <Card className="register-card" title={<div className="register-title">Create Account</div>}>
             <Form
               name="register"
               onFinish={onFinish}
@@ -40,78 +40,78 @@ const Register = () => {
               size="large"
             >
               <Form.Item
-                label="用户名"
+                label="Username"
                 name="username"
                 rules={[
-                  { required: true, message: '请输入用户名' },
-                  { min: 3, message: '用户名至少3个字符' },
+                  { required: true, message: 'Please enter username' },
+                  { min: 3, message: 'Username must be at least 3 characters' },
                 ]}
               >
                 <Input
                   prefix={<UserOutlined className="input-icon" />}
-                  placeholder="请输入用户名（至少3个字符）"
+                  placeholder="Enter username (at least 3 characters)"
                 />
               </Form.Item>
 
               <Form.Item
-                label="邮箱"
+                label="Email"
                 name="email"
                 rules={[
-                  { required: true, message: '请输入邮箱' },
-                  { type: 'email', message: '请输入有效的邮箱地址' },
+                  { required: true, message: 'Please enter email' },
+                  { type: 'email', message: 'Please enter a valid email address' },
                 ]}
               >
                 <Input
                   prefix={<MailOutlined className="input-icon" />}
-                  placeholder="请输入邮箱"
+                  placeholder="Enter email"
                 />
               </Form.Item>
 
               <Form.Item
-                label="密码"
+                label="Password"
                 name="password"
                 rules={[
-                  { required: true, message: '请输入密码' },
-                  { min: 6, message: '密码至少6个字符' },
+                  { required: true, message: 'Please enter password' },
+                  { min: 6, message: 'Password must be at least 6 characters' },
                 ]}
               >
                 <Input.Password
                   prefix={<LockOutlined className="input-icon" />}
-                  placeholder="请输入密码（至少6个字符）"
+                  placeholder="Enter password (at least 6 characters)"
                 />
               </Form.Item>
 
               <Form.Item
-                label="确认密码"
+                label="Confirm Password"
                 name="confirmPassword"
                 dependencies={['password']}
                 rules={[
-                  { required: true, message: '请确认密码' },
+                  { required: true, message: 'Please confirm password' },
                   ({ getFieldValue }) => ({
                     validator(_, value) {
                       if (!value || getFieldValue('password') === value) {
                         return Promise.resolve();
                       }
-                      return Promise.reject(new Error('两次输入的密码不一致'));
+                      return Promise.reject(new Error('The two passwords do not match'));
                     },
                   }),
                 ]}
               >
                 <Input.Password
                   prefix={<LockOutlined className="input-icon" />}
-                  placeholder="请再次输入密码"
+                  placeholder="Enter password again"
                 />
               </Form.Item>
 
               <Form.Item>
                 <Button type="primary" htmlType="submit" block className="register-button">
-                  注册
+                  Register
                 </Button>
               </Form.Item>
 
               <Form.Item style={{ marginBottom: 0, textAlign: 'center' }}>
                 <Link to="/login" className="login-link">
-                  已有账号？立即登录
+                  Already have an account? Login now
                 </Link>
               </Form.Item>
             </Form>

@@ -23,14 +23,14 @@ const Categories = () => {
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [form] = Form.useForm();
 
-  // 从后端获取分类列表
+  // Fetch categories from backend
   const fetchCategories = async () => {
     setLoading(true);
     try {
       const response = await api.get('/categories');
       setCategories(response.data);
     } catch (error: any) {
-      message.error('获取分类列表失败');
+      message.error('Failed to fetch categories');
     } finally {
       setLoading(false);
     }
@@ -40,59 +40,59 @@ const Categories = () => {
     fetchCategories();
   }, []);
 
-  // 打开添加或编辑分类的弹窗
+  // Open modal for adding or editing category
   const handleOpenModal = (category?: Category) => {
     if (category) {
-      // 编辑模式
+      // Edit mode
       setEditingCategory(category);
       form.setFieldsValue({
         name: category.name,
         parentId: category.parentId,
       });
     } else {
-      // 新建模式
+      // Create mode
       setEditingCategory(null);
       form.resetFields();
     }
     setModalVisible(true);
   };
 
-  // 保存分类（新建或更新）
+  // Save category (create or update)
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
-      // 如果父分类是undefined（清空了），改成null
+      // If parentId is undefined (cleared), set to null
       const submitData = {
         ...values,
         parentId: values.parentId === undefined ? null : values.parentId,
       };
       if (editingCategory) {
         await api.patch(`/categories/${editingCategory.id}`, submitData);
-        message.success('分类更新成功');
+        message.success('Category updated successfully');
       } else {
         await api.post('/categories', submitData);
-        message.success('分类创建成功');
+        message.success('Category created successfully');
       }
       setModalVisible(false);
       form.resetFields();
-      fetchCategories(); // 刷新列表
+      fetchCategories(); // Refresh list
     } catch (error: any) {
-      message.error(error.response?.data?.message || '操作失败');
+      message.error(error.response?.data?.message || 'Operation failed');
     }
   };
 
-  // 删除分类
+  // Delete category
   const handleDelete = async (id: number) => {
     try {
       await api.delete(`/categories/${id}`);
-      message.success('分类删除成功');
-      fetchCategories(); // 刷新列表
+      message.success('Category deleted successfully');
+      fetchCategories(); // Refresh list
     } catch (error: any) {
-      message.error(error.response?.data?.message || '删除失败');
+      message.error(error.response?.data?.message || 'Delete failed');
     }
   };
 
-  // 根据父分类ID找父分类名称，用于显示
+  // Find parent category name by parentId for display
   const getParentName = (parentId: number | null) => {
     if (!parentId) return '-';
     const parent = categories.find((cat) => cat.id === parentId);
@@ -107,30 +107,30 @@ const Categories = () => {
       width: 80,
     },
     {
-      title: '分类名称',
+      title: 'Category Name',
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: '父分类',
+      title: 'Parent Category',
       dataIndex: 'parentId',
       key: 'parentId',
       render: (parentId: number | null) => getParentName(parentId),
     },
     {
-      title: '商品数量',
+      title: 'Product Count',
       dataIndex: '_count',
       key: '_count',
       render: (_count: any) => _count?.products || 0,
     },
     {
-      title: '创建时间',
+      title: 'Created At',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (date: string) => new Date(date).toLocaleString('zh-CN'),
+      render: (date: string) => new Date(date).toLocaleString('en-US'),
     },
     {
-      title: '操作',
+      title: 'Actions',
       key: 'action',
       render: (_: any, record: Category) => (
         <Space>
@@ -140,16 +140,16 @@ const Categories = () => {
             onClick={() => handleOpenModal(record)}
             className="action-button"
           >
-            编辑
+            Edit
           </Button>
           <Popconfirm
-            title="确定要删除这个分类吗？"
+            title="Are you sure you want to delete this category?"
             onConfirm={() => handleDelete(record.id)}
-            okText="确定"
-            cancelText="取消"
+            okText="Confirm"
+            cancelText="Cancel"
           >
             <Button type="link" danger icon={<DeleteOutlined />} className="action-button">
-              删除
+              Delete
             </Button>
           </Popconfirm>
         </Space>
@@ -161,7 +161,7 @@ const Categories = () => {
     <div className="categories-page">
       <Card className="categories-card">
         <div className="page-header">
-          <h2 className="page-title">分类管理</h2>
+          <h2 className="page-title">Category Management</h2>
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -169,7 +169,7 @@ const Categories = () => {
             className="add-button"
             size="large"
           >
-            创建分类
+            Create Category
           </Button>
         </div>
 
@@ -184,7 +184,7 @@ const Categories = () => {
       </Card>
 
       <Modal
-        title={editingCategory ? '编辑分类' : '创建分类'}
+        title={editingCategory ? 'Edit Category' : 'Create Category'}
         open={modalVisible}
         onOk={handleSubmit}
         onCancel={() => {
@@ -193,18 +193,20 @@ const Categories = () => {
         }}
         width={500}
         className="category-modal"
+        okText="Save"
+        cancelText="Cancel"
       >
         <Form form={form} layout="vertical">
           <Form.Item
             name="name"
-            label="分类名称"
-            rules={[{ required: true, message: '请输入分类名称' }]}
+            label="Category Name"
+            rules={[{ required: true, message: 'Please enter category name' }]}
           >
-            <Input placeholder="请输入分类名称" />
+            <Input placeholder="Enter category name" />
           </Form.Item>
 
-          <Form.Item name="parentId" label="父分类">
-            <Select placeholder="请选择父分类（可选）" allowClear>
+          <Form.Item name="parentId" label="Parent Category">
+            <Select placeholder="Select parent category (optional)" allowClear>
               {categories
                 .filter((cat) => cat.id !== editingCategory?.id)
                 .map((category) => (

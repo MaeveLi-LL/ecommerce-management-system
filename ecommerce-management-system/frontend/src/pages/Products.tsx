@@ -34,38 +34,38 @@ const Products = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [form] = Form.useForm();
 
-  // 从后端获取商品列表
+  // Fetch products from backend
   const fetchProducts = async () => {
     setLoading(true);
     try {
       const response = await api.get('/products');
-      console.log('获取到的商品列表:', response.data); // 调试日志
+      console.log('Fetched products:', response.data);
       setProducts(response.data);
     } catch (error: any) {
-      message.error('获取商品列表失败');
+      message.error('Failed to fetch products');
     } finally {
       setLoading(false);
     }
   };
 
-  // 获取商品详情
+  // Fetch product details
   const fetchProductDetail = async (id: number) => {
     try {
       const response = await api.get(`/products/${id}`);
       setDetailProduct(response.data);
       setDetailModalVisible(true);
     } catch (error: any) {
-      message.error('获取商品详情失败');
+      message.error('Failed to fetch product details');
     }
   };
 
-  // 获取分类列表，用于下拉选择
+  // Fetch categories for dropdown selection
   const fetchCategories = async () => {
     try {
       const response = await api.get('/categories');
       setCategories(response.data);
     } catch (error: any) {
-      message.error('获取分类列表失败');
+      message.error('Failed to fetch categories');
     }
   };
 
@@ -74,10 +74,10 @@ const Products = () => {
     fetchCategories();
   }, []);
 
-  // 打开添加或编辑商品的弹窗
+  // Open modal for adding or editing product
   const handleOpenModal = (product?: Product) => {
     if (product) {
-      // 编辑模式，把商品信息填到表单里
+      // Edit mode: populate form with product data
       setEditingProduct(product);
       form.setFieldsValue({
         name: product.name,
@@ -87,7 +87,7 @@ const Products = () => {
         categoryId: product.categoryId,
         imageUrl: product.imageUrl,
       });
-      // 如果有图片，设置文件列表
+      // If image exists, set file list
       if (product.imageUrl) {
         setFileList([
           {
@@ -103,7 +103,7 @@ const Products = () => {
         setFileList([]);
       }
     } else {
-      // 新建模式，清空表单
+      // Create mode: clear form
       setEditingProduct(null);
       form.resetFields();
       setFileList([]);
@@ -111,14 +111,14 @@ const Products = () => {
     setModalVisible(true);
   };
 
-  // 处理图片上传
+  // Handle image upload
   const handleUpload = async (options: any) => {
     const { file, onSuccess, onError } = options;
     
     try {
       const fileUid = (file as any).uid || Date.now().toString();
       
-      // 先更新文件列表为上传中状态
+      // Update file list to uploading status
       const uploadFile: UploadFile = {
         uid: fileUid,
         name: (file as File).name,
@@ -131,7 +131,7 @@ const Products = () => {
       
       const token = sessionStorage.getItem('token');
       if (!token) {
-        throw new Error('请先登录');
+        throw new Error('Please login first');
       }
       
       const response = await fetch('http://localhost:3000/upload/image', {
@@ -144,121 +144,121 @@ const Products = () => {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || '上传失败');
+        throw new Error(errorData.message || 'Upload failed');
       }
 
       const data = await response.json();
-      console.log('上传成功，返回数据:', data); // 调试日志
+      console.log('Upload successful, response:', data);
       
-      // 更新表单中的 imageUrl 字段（使用相对路径，不带 http://localhost:3000）
-      const imageUrlValue = data.url; // 后端返回的是 /uploads/images/xxx.jpg
+      // Update imageUrl in form (use relative path without http://localhost:3000)
+      const imageUrlValue = data.url; // Backend returns /uploads/images/xxx.jpg
       form.setFieldsValue({ imageUrl: imageUrlValue });
-      console.log('设置 imageUrl 到表单:', imageUrlValue); // 调试日志
+      console.log('Set imageUrl to form:', imageUrlValue);
       
-      // 更新文件列表为成功状态，使用服务器返回的URL
+      // Update file list to success status, use server URL
       const imageUrl = `http://localhost:3000${data.url}`;
       const successFile: UploadFile = {
         uid: fileUid,
         name: (file as File).name,
         status: 'done',
-        url: imageUrl, // 使用服务器URL，不是本地文件路径
-        thumbUrl: imageUrl, // 缩略图也使用服务器URL
+        url: imageUrl, // Use server URL, not local file path
+        thumbUrl: imageUrl, // Thumbnail also uses server URL
       };
       setFileList([successFile]);
       
-      message.success('图片上传成功');
+      message.success('Image uploaded successfully');
       onSuccess?.(data, new XMLHttpRequest());
     } catch (error: any) {
-      // 更新文件列表为错误状态
+      // Update file list to error status
       const errorFile: UploadFile = {
         uid: (file as any).uid || Date.now().toString(),
         name: (file as File).name,
         status: 'error',
       };
       setFileList([errorFile]);
-      message.error(error.message || '图片上传失败');
+      message.error(error.message || 'Image upload failed');
       onError?.(error);
     }
   };
 
-  // 处理图片删除
+  // Handle image removal
   const handleRemove = () => {
     setFileList([]);
     form.setFieldsValue({ imageUrl: null });
   };
 
-  // 保存商品（新建或更新）
+  // Save product (create or update)
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
       
-      // 确保 imageUrl 被包含在提交的数据中
-      // 先尝试从表单获取，如果为空，尝试从 fileList 获取
+      // Ensure imageUrl is included in submitted data
+      // Try to get from form first, if empty, try from fileList
       let imageUrl = form.getFieldValue('imageUrl');
-      console.log('从表单获取的 imageUrl:', imageUrl); // 调试日志
+      console.log('ImageUrl from form:', imageUrl);
       
       if (!imageUrl && fileList.length > 0) {
         const file = fileList[0];
-        console.log('fileList 中的文件对象:', file); // 调试日志
-        console.log('文件状态:', file.status); // 调试日志
+        console.log('File object in fileList:', file);
+        console.log('File status:', file.status);
         
-        // 如果文件还在上传中，提示用户等待
+        // If file is still uploading, prompt user to wait
         if (file.status === 'uploading') {
-          message.warning('图片正在上传中，请稍候...');
-          return; // 阻止提交，等待上传完成
+          message.warning('Image is uploading, please wait...');
+          return; // Prevent submission, wait for upload to complete
         }
         
-        // 如果表单中没有，从 fileList 中提取 URL
+        // If not in form, extract URL from fileList
         if (file.url && file.status === 'done') {
-          // 去掉 http://localhost:3000 前缀，只保留相对路径
+          // Remove http://localhost:3000 prefix, keep only relative path
           imageUrl = file.url.replace('http://localhost:3000', '');
-          console.log('从 fileList 提取的 imageUrl:', imageUrl); // 调试日志
+          console.log('Extracted imageUrl from fileList:', imageUrl);
         } else if (file.response?.url) {
-          // 如果 url 在 response 中
+          // If url is in response
           imageUrl = file.response.url;
-          console.log('从 fileList response 提取的 imageUrl:', imageUrl); // 调试日志
+          console.log('Extracted imageUrl from fileList response:', imageUrl);
         } else if (file.status !== 'done') {
-          // 如果文件还没有上传完成
-          message.warning('请等待图片上传完成后再保存');
-          return; // 阻止提交
+          // If file hasn't finished uploading
+          message.warning('Please wait for image upload to complete before saving');
+          return; // Prevent submission
         }
       }
       
       const submitData = {
         ...values,
-        imageUrl: imageUrl || null, // 确保 imageUrl 被包含
+        imageUrl: imageUrl || null, // Ensure imageUrl is included
       };
       
-      console.log('提交的商品数据:', submitData); // 调试日志
-      console.log('最终使用的 imageUrl:', imageUrl); // 调试日志
+      console.log('Submitting product data:', submitData);
+      console.log('Final imageUrl used:', imageUrl);
       
       if (editingProduct) {
-        // 更新已有商品
+        // Update existing product
         await api.patch(`/products/${editingProduct.id}`, submitData);
-        message.success('商品更新成功');
+        message.success('Product updated successfully');
       } else {
-        // 创建新商品
+        // Create new product
         await api.post('/products', submitData);
-        message.success('商品创建成功');
+        message.success('Product created successfully');
       }
       setModalVisible(false);
       form.resetFields();
-      setFileList([]); // 清空文件列表
-      fetchProducts(); // 刷新列表
+      setFileList([]); // Clear file list
+      fetchProducts(); // Refresh list
     } catch (error: any) {
-      console.error('保存商品失败:', error); // 调试日志
-      message.error(error.response?.data?.message || '操作失败');
+      console.error('Failed to save product:', error);
+      message.error(error.response?.data?.message || 'Operation failed');
     }
   };
 
-  // 删除商品
+  // Delete product
   const handleDelete = async (id: number) => {
     try {
       await api.delete(`/products/${id}`);
-      message.success('商品删除成功');
-      fetchProducts(); // 刷新列表
+      message.success('Product deleted successfully');
+      fetchProducts(); // Refresh list
     } catch (error: any) {
-      message.error(error.response?.data?.message || '删除失败');
+      message.error(error.response?.data?.message || 'Delete failed');
     }
   };
 
@@ -270,24 +270,24 @@ const Products = () => {
       width: 80,
     },
     {
-      title: '商品图片',
+      title: 'Product Image',
       dataIndex: 'imageUrl',
       key: 'imageUrl',
       width: 100,
       render: (imageUrl: string | null) => {
         if (imageUrl) {
-          // 处理图片URL：如果是相对路径，添加服务器地址
+          // Handle image URL: if relative path, add server address
           const imageSrc = imageUrl.startsWith('http') 
             ? imageUrl 
             : `http://localhost:3000${imageUrl}`;
           return (
             <Image
               src={imageSrc}
-              alt="商品图片"
+              alt="Product Image"
               width={60}
               height={60}
               style={{ objectFit: 'cover', borderRadius: 4 }}
-              fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAwIiB5PSIzMTAiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiPuaXoOazleWKoOi9veWbvueJhzwvdGV4dD48L3N2Zz4="
+              fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiBmaWxsPSIjZjBmMGYwIi8+PHRleHQgeD0iNTAwIiB5PSIzMTAiIGZvbnQtc2l6ZT0iMTQiIGZpbGw9IiM5OTkiIHRleHQtYW5jaG9yPSJtaWRkbGUiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg=="
             />
           );
         }
@@ -305,13 +305,13 @@ const Products = () => {
               fontSize: 12,
             }}
           >
-            暂无图片
+            No Image
           </div>
         );
       },
     },
     {
-      title: '商品名称',
+      title: 'Product Name',
       dataIndex: 'name',
       key: 'name',
       render: (name: string, record: Product) => (
@@ -325,19 +325,19 @@ const Products = () => {
       ),
     },
     {
-      title: '描述',
+      title: 'Description',
       dataIndex: 'description',
       key: 'description',
       ellipsis: true,
     },
     {
-      title: '价格',
+      title: 'Price',
       dataIndex: 'price',
       key: 'price',
-      render: (price: number) => <span className="price-text">¥{price.toFixed(2)}</span>,
+      render: (price: number) => <span className="price-text">${price.toFixed(2)}</span>,
     },
     {
-      title: '库存',
+      title: 'Stock',
       dataIndex: 'stock',
       key: 'stock',
       render: (stock: number) => (
@@ -345,19 +345,19 @@ const Products = () => {
       ),
     },
     {
-      title: '分类',
+      title: 'Category',
       dataIndex: 'category',
       key: 'category',
       render: (category: Category | null) => category?.name || '-',
     },
     {
-      title: '创建时间',
+      title: 'Created At',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (date: string) => new Date(date).toLocaleString('zh-CN'),
+      render: (date: string) => new Date(date).toLocaleString('en-US'),
     },
     {
-      title: '操作',
+      title: 'Actions',
       key: 'action',
       render: (_: any, record: Product) => (
         <Space>
@@ -367,16 +367,16 @@ const Products = () => {
             onClick={() => handleOpenModal(record)}
             className="action-button"
           >
-            编辑
+            Edit
           </Button>
           <Popconfirm
-            title="确定要删除这个商品吗？"
+            title="Are you sure you want to delete this product?"
             onConfirm={() => handleDelete(record.id)}
-            okText="确定"
-            cancelText="取消"
+            okText="Confirm"
+            cancelText="Cancel"
           >
             <Button type="link" danger icon={<DeleteOutlined />} className="action-button">
-              删除
+              Delete
             </Button>
           </Popconfirm>
         </Space>
@@ -388,7 +388,7 @@ const Products = () => {
     <div className="products-page">
       <Card className="products-card">
         <div className="page-header">
-          <h2 className="page-title">商品管理</h2>
+          <h2 className="page-title">Product Management</h2>
           <Button
             type="primary"
             icon={<PlusOutlined />}
@@ -396,7 +396,7 @@ const Products = () => {
             className="add-button"
             size="large"
           >
-            创建商品
+            Create Product
           </Button>
         </div>
 
@@ -411,7 +411,7 @@ const Products = () => {
       </Card>
 
       <Modal
-        title={editingProduct ? '编辑商品' : '创建商品'}
+        title={editingProduct ? 'Edit Product' : 'Create Product'}
         open={modalVisible}
         onOk={handleSubmit}
         onCancel={() => {
@@ -420,32 +420,34 @@ const Products = () => {
         }}
         width={600}
         className="product-modal"
+        okText="Save"
+        cancelText="Cancel"
       >
         <Form form={form} layout="vertical">
           <Form.Item
             name="name"
-            label="商品名称"
-            rules={[{ required: true, message: '请输入商品名称' }]}
+            label="Product Name"
+            rules={[{ required: true, message: 'Please enter product name' }]}
           >
-            <Input placeholder="请输入商品名称" />
+            <Input placeholder="Enter product name" />
           </Form.Item>
 
-          <Form.Item name="description" label="商品描述">
-            <TextArea rows={4} placeholder="请输入商品描述" />
+          <Form.Item name="description" label="Description">
+            <TextArea rows={4} placeholder="Enter product description" />
           </Form.Item>
 
           <Form.Item
             name="price"
-            label="价格"
+            label="Price"
             rules={[
-              { required: true, message: '请输入价格' },
-              { type: 'number', min: 0, message: '价格必须大于0' },
+              { required: true, message: 'Please enter price' },
+              { type: 'number', min: 0, message: 'Price must be greater than 0' },
             ]}
           >
             <InputNumber
               style={{ width: '100%' }}
-              placeholder="请输入价格"
-              prefix="¥"
+              placeholder="Enter price"
+              prefix="$"
               min={0}
               step={0.01}
             />
@@ -453,21 +455,21 @@ const Products = () => {
 
           <Form.Item
             name="stock"
-            label="库存"
+            label="Stock"
             rules={[
-              { required: true, message: '请输入库存' },
-              { type: 'number', min: 0, message: '库存必须大于等于0' },
+              { required: true, message: 'Please enter stock' },
+              { type: 'number', min: 0, message: 'Stock must be greater than or equal to 0' },
             ]}
           >
             <InputNumber
               style={{ width: '100%' }}
-              placeholder="请输入库存"
+              placeholder="Enter stock"
               min={0}
             />
           </Form.Item>
 
-          <Form.Item name="categoryId" label="分类">
-            <Select placeholder="请选择分类" allowClear>
+          <Form.Item name="categoryId" label="Category">
+            <Select placeholder="Select category" allowClear>
               {categories.map((category) => (
                 <Select.Option key={category.id} value={category.id}>
                   {category.name}
@@ -476,11 +478,11 @@ const Products = () => {
             </Select>
           </Form.Item>
 
-          <Form.Item name="imageUrl" label="商品图片" hidden>
+          <Form.Item name="imageUrl" label="Product Image" hidden>
             <Input />
           </Form.Item>
           
-          <Form.Item label="上传图片">
+          <Form.Item label="Upload Image">
             <Upload
               fileList={fileList}
               customRequest={handleUpload}
@@ -489,84 +491,80 @@ const Products = () => {
               maxCount={1}
               accept="image/*"
               beforeUpload={(file) => {
-                console.log('beforeUpload 被调用，文件:', file); // 调试日志
-                // 检查文件大小（5MB）
+                console.log('beforeUpload called, file:', file);
+                // Check file size (5MB)
                 const isLt5M = file.size / 1024 / 1024 < 5;
                 if (!isLt5M) {
-                  message.error('图片大小不能超过 5MB!');
+                  message.error('Image size cannot exceed 5MB!');
                   return Upload.LIST_IGNORE;
                 }
-                // 检查文件类型
+                // Check file type
                 const isImage = file.type.startsWith('image/');
                 if (!isImage) {
-                  message.error('只能上传图片文件!');
+                  message.error('Only image files are allowed!');
                   return Upload.LIST_IGNORE;
                 }
-                // 返回 false 阻止默认上传，使用 customRequest
-                // 注意：返回 false 时，文件会被添加到 fileList，但不会自动调用 customRequest
-                // 需要在 onChange 中手动触发
-                // 但是，我们可以在这里直接触发上传
+                // Return false to prevent default upload, use customRequest
                 setTimeout(() => {
-                  console.log('在 beforeUpload 后触发上传，文件:', file); // 调试日志
+                  console.log('Triggering upload after beforeUpload, file:', file);
                   handleUpload({
                     file: file,
                     onSuccess: (response: any) => {
-                      console.log('上传成功回调:', response);
+                      console.log('Upload success callback:', response);
                     },
                     onError: (error: any) => {
-                      console.error('上传失败回调:', error);
+                      console.error('Upload error callback:', error);
                     },
                   } as any);
-                }, 100); // 延迟一点，确保 fileList 已更新
+                }, 100); // Delay a bit to ensure fileList is updated
                 return false;
               }}
               onChange={(info) => {
-                console.log('文件列表变化:', info); // 调试日志
+                console.log('File list changed:', info);
                 const { file, fileList: newFileList } = info;
                 
-                console.log('文件状态:', file.status); // 调试日志
-                console.log('是否有 originFileObj:', !!file.originFileObj); // 调试日志
+                console.log('File status:', file.status);
+                console.log('Has originFileObj:', !!file.originFileObj);
                 
-                // 更新文件列表
+                // Update file list
                 setFileList(newFileList as UploadFile[]);
                 
-                // 如果文件刚被添加（没有状态或状态为 undefined），手动触发上传
-                // 尝试从 originFileObj 或直接使用 file 对象
+                // If file was just added (no status or status is undefined), manually trigger upload
                 const fileToUpload = file.originFileObj || (file as any);
                 
                 if ((file.status === undefined || !file.status) && fileToUpload) {
-                  console.log('检测到新文件，开始上传...', file); // 调试日志
-                  console.log('使用的文件对象:', fileToUpload); // 调试日志
-                  // 手动调用上传函数
+                  console.log('New file detected, starting upload...', file);
+                  console.log('File object used:', fileToUpload);
+                  // Manually call upload function
                   handleUpload({
                     file: fileToUpload,
                     onSuccess: (response: any) => {
-                      console.log('上传成功回调:', response);
+                      console.log('Upload success callback:', response);
                     },
                     onError: (error: any) => {
-                      console.error('上传失败回调:', error);
+                      console.error('Upload error callback:', error);
                     },
                   } as any);
                 } else {
-                  console.log('不满足上传条件，文件状态:', file.status, '是否有 originFileObj:', !!file.originFileObj, 'fileToUpload:', !!fileToUpload); // 调试日志
+                  console.log('Upload condition not met, file status:', file.status, 'has originFileObj:', !!file.originFileObj, 'fileToUpload:', !!fileToUpload);
                 }
               }}
             >
               {fileList.length < 1 && (
                 <div>
                   <UploadOutlined />
-                  <div style={{ marginTop: 8 }}>上传图片</div>
+                  <div style={{ marginTop: 8 }}>Upload Image</div>
                 </div>
               )}
             </Upload>
             <div style={{ marginTop: 8, color: '#999', fontSize: 12 }}>
-              支持 JPG、PNG、GIF、WEBP 格式，最大 5MB
+              Supports JPG, PNG, GIF, WEBP formats, max 5MB
             </div>
           </Form.Item>
           
-          <Form.Item name="imageUrlText" label="或输入图片URL">
+          <Form.Item name="imageUrlText" label="Or Enter Image URL">
             <Input
-              placeholder="也可以直接输入图片链接地址"
+              placeholder="Or directly enter image URL"
               allowClear
               onChange={(e) => {
                 form.setFieldsValue({ imageUrl: e.target.value || null });
@@ -579,9 +577,9 @@ const Products = () => {
         </Form>
       </Modal>
 
-      {/* 商品详情弹窗 */}
+      {/* Product Detail Modal */}
       <Modal
-        title="商品详情"
+        title="Product Details"
         open={detailModalVisible}
         onCancel={() => {
           setDetailModalVisible(false);
@@ -592,7 +590,7 @@ const Products = () => {
             setDetailModalVisible(false);
             setDetailProduct(null);
           }}>
-            关闭
+            Close
           </Button>,
           <Button
             key="edit"
@@ -604,7 +602,7 @@ const Products = () => {
               }
             }}
           >
-            编辑
+            Edit
           </Button>,
         ]}
         width={600}
@@ -613,63 +611,63 @@ const Products = () => {
         {detailProduct && (
           <div style={{ padding: '20px 0' }}>
             <div style={{ marginBottom: 16 }}>
-              <strong>商品ID：</strong>
+              <strong>Product ID: </strong>
               <span>{detailProduct.id}</span>
             </div>
             {detailProduct.imageUrl && (
               <div style={{ marginBottom: 16 }}>
-                <strong>商品图片：</strong>
+                <strong>Product Image: </strong>
                 <div style={{ marginTop: 8 }}>
                   <Image
                     src={detailProduct.imageUrl.startsWith('http') 
                       ? detailProduct.imageUrl 
                       : `http://localhost:3000${detailProduct.imageUrl}`}
-                    alt="商品图片"
+                    alt="Product Image"
                     width={200}
                     style={{ borderRadius: 8 }}
-                    fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwMCIgeT0iMzEwIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj7ml6Dms5XliqDovb3lm77niYc8L3RleHQ+PC9zdmc+"
+                    fallback="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YwZjBmMCIvPjx0ZXh0IHg9IjUwMCIgeT0iMzEwIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOTk5IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIj5ObyBJbWFnZTwvdGV4dD48L3N2Zz4="
                   />
                 </div>
               </div>
             )}
             <div style={{ marginBottom: 16 }}>
-              <strong>商品名称：</strong>
+              <strong>Product Name: </strong>
               <span>{detailProduct.name}</span>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <strong>商品描述：</strong>
+              <strong>Description: </strong>
               <div style={{ marginTop: 8, color: '#666' }}>
-                {detailProduct.description || '暂无描述'}
+                {detailProduct.description || 'No description'}
               </div>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <strong>价格：</strong>
+              <strong>Price: </strong>
               <span className="price-text" style={{ fontSize: 18, marginLeft: 8 }}>
-                ¥{detailProduct.price.toFixed(2)}
+                ${detailProduct.price.toFixed(2)}
               </span>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <strong>库存：</strong>
+              <strong>Stock: </strong>
               <Tag color={detailProduct.stock > 0 ? 'green' : 'red'} style={{ marginLeft: 8 }}>
                 {detailProduct.stock}
               </Tag>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <strong>分类：</strong>
+              <strong>Category: </strong>
               <span style={{ marginLeft: 8 }}>
-                {detailProduct.category?.name || '未分类'}
+                {detailProduct.category?.name || 'Uncategorized'}
               </span>
             </div>
             <div style={{ marginBottom: 16 }}>
-              <strong>创建时间：</strong>
+              <strong>Created At: </strong>
               <span style={{ marginLeft: 8 }}>
-                {new Date(detailProduct.createdAt).toLocaleString('zh-CN')}
+                {new Date(detailProduct.createdAt).toLocaleString('en-US')}
               </span>
             </div>
             <div>
-              <strong>更新时间：</strong>
+              <strong>Updated At: </strong>
               <span style={{ marginLeft: 8 }}>
-                {new Date(detailProduct.updatedAt).toLocaleString('zh-CN')}
+                {new Date(detailProduct.updatedAt).toLocaleString('en-US')}
               </span>
             </div>
           </div>
