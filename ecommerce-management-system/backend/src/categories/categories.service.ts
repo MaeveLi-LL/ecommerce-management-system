@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -6,19 +6,36 @@ export class CategoriesService {
   constructor(private prisma: PrismaService) {}
 
   // 创建分类
-  async create(name: string, parentId?: number) {
-    // 检查分类名是否重复
-    const existing = await this.prisma.category.findUnique({
-      where: { name },
+  async create(userId: number, name: string, parentId?: number) {
+    // 检查该用户下分类名是否重复
+    const existing = await this.prisma.category.findFirst({
+      where: {
+        name,
+        userId,
+      },
     });
 
     if (existing) {
       throw new ConflictException('分类名称已存在');
     }
 
+    // 如果指定了父分类，检查父分类是否属于当前用户
+    if (parentId) {
+      const parent = await this.prisma.category.findUnique({
+        where: { id: parentId },
+      });
+      if (!parent) {
+        throw new NotFoundException('父分类不存在');
+      }
+      if (parent.userId !== userId) {
+        throw new ForbiddenException('无权使用该父分类');
+      }
+    }
+
     return this.prisma.category.create({
       data: {
         name,
+        userId,
         parentId: parentId || null,
       },
       include: {
@@ -28,9 +45,10 @@ export class CategoriesService {
     });
   }
 
-  // 获取所有分类列表
-  async findAll() {
+  // 获取当前用户的所有分类列表
+  async findAll(userId: number) {
     return this.prisma.category.findMany({
+      where: { userId },
       include: {
         parent: true,
         children: true,
@@ -45,7 +63,7 @@ export class CategoriesService {
   }
 
   // 根据ID查找单个分类
-  async findOne(id: number) {
+  async findOne(id: number, userId?: number) {
     const category = await this.prisma.category.findUnique({
       where: { id },
       include: {
@@ -59,20 +77,45 @@ export class CategoriesService {
       throw new NotFoundException('分类不存在');
     }
 
+    // 如果提供了userId，检查分类是否属于该用户
+    if (userId !== undefined && category.userId !== userId) {
+      throw new ForbiddenException('无权访问此分类');
+    }
+
     return category;
   }
 
   // 更新分类信息
-  async update(id: number, name?: string, parentId?: number) {
-    const category = await this.findOne(id);
+  async update(id: number, userId: number, name?: string, parentId?: number | null) {
+    const category = await this.findOne(id, userId);
 
-    // 如果要改名字，先检查新名字是否已经被用了
+    // 如果要改名字，先检查新名字是否已经被该用户用了
     if (name && name !== category.name) {
-      const existing = await this.prisma.category.findUnique({
-        where: { name },
+      const existing = await this.prisma.category.findFirst({
+        where: {
+          name,
+          userId,
+        },
       });
       if (existing) {
         throw new ConflictException('分类名称已存在');
+      }
+    }
+
+    // 如果指定了父分类，检查父分类是否属于当前用户
+    if (parentId !== null && parentId !== undefined) {
+      const parent = await this.prisma.category.findUnique({
+        where: { id: parentId },
+      });
+      if (!parent) {
+        throw new NotFoundException('父分类不存在');
+      }
+      if (parent.userId !== userId) {
+        throw new ForbiddenException('无权使用该父分类');
+      }
+      // 不能将分类设置为自己的子分类
+      if (parentId === id) {
+        throw new ConflictException('不能将分类设置为自己的父分类');
       }
     }
 
@@ -90,8 +133,25 @@ export class CategoriesService {
   }
 
   // 删除分类
-  async remove(id: number) {
-    await this.findOne(id);
+  async remove(id: number, userId: number) {
+    const category = await this.findOne(id, userId);
+    
+    // 检查是否有子分类
+    const childrenCount = await this.prisma.category.count({
+      where: { parentId: id },
+    });
+    if (childrenCount > 0) {
+      throw new ConflictException('该分类下还有子分类，无法删除');
+    }
+
+    // 检查是否有商品使用该分类
+    const productsCount = await this.prisma.product.count({
+      where: { categoryId: id },
+    });
+    if (productsCount > 0) {
+      throw new ConflictException('该分类下还有商品，无法删除');
+    }
+
     return this.prisma.category.delete({
       where: { id },
     });

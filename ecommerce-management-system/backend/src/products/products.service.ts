@@ -14,6 +14,19 @@ export class ProductsService {
     stock: number,
     categoryId?: number,
   ) {
+    // 如果指定了分类，检查分类是否属于当前用户
+    if (categoryId) {
+      const category = await this.prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+      if (!category) {
+        throw new NotFoundException('分类不存在');
+      }
+      if (category.userId !== userId) {
+        throw new ForbiddenException('无权使用该分类');
+      }
+    }
+
     return this.prisma.product.create({
       data: {
         name,
@@ -87,6 +100,19 @@ export class ProductsService {
     // 检查商品是否属于当前用户
     if (product.userId !== userId) {
       throw new ForbiddenException('无权修改此商品');
+    }
+
+    // 如果指定了新的分类，检查分类是否属于当前用户
+    if (categoryId !== undefined && categoryId !== null) {
+      const category = await this.prisma.category.findUnique({
+        where: { id: categoryId },
+      });
+      if (!category) {
+        throw new NotFoundException('分类不存在');
+      }
+      if (category.userId !== userId) {
+        throw new ForbiddenException('无权使用该分类');
+      }
     }
 
     return this.prisma.product.update({

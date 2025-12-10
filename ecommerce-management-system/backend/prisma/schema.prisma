@@ -19,21 +19,26 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  products Product[]
+  products   Product[]
+  categories Category[]
   @@map("users")
 }
 
 // 分类表
 model Category {
   id        Int      @id @default(autoincrement())
-  name      String   @unique
+  name      String
+  userId    Int      // 分类所属用户ID
   parentId  Int?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   parent    Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
   children  Category[] @relation("CategoryHierarchy")
   products  Product[]
+  
+  @@unique([name, userId]) // 同一用户下分类名称唯一
   @@map("categories")
 }
 
