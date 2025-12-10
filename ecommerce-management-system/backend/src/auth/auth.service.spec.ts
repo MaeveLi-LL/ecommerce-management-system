@@ -64,7 +64,7 @@ describe('AuthService', () => {
   });
 
   describe('login', () => {
-    it('应该返回JWT token和用户信息', () => {
+    it('应该返回JWT token和用户信息', async () => {
       const mockUser = {
         id: 1,
         username: 'testuser',
@@ -74,7 +74,7 @@ describe('AuthService', () => {
 
       mockJwtService.sign.mockReturnValue(mockToken);
 
-      const result = service.login(mockUser);
+      const result = await service.login(mockUser);
 
       expect(result).toEqual({
         access_token: mockToken,
