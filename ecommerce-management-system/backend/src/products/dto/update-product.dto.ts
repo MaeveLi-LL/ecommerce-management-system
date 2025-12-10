@@ -29,6 +29,11 @@ export class UpdateProductDto {
   @IsNumber()
   @IsOptional()
   categoryId?: number;
+
+  @ApiPropertyOptional({ description: '商品图片URL', example: 'https://example.com/image.jpg' })
+  @IsString()
+  @IsOptional()
+  imageUrl?: string;
 }
 
 

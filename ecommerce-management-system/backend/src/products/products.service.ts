@@ -13,6 +13,7 @@ export class ProductsService {
     price: number,
     stock: number,
     categoryId?: number,
+    imageUrl?: string,
   ) {
     // 如果指定了分类，检查分类是否属于当前用户
     if (categoryId) {
@@ -33,6 +34,7 @@ export class ProductsService {
         description,
         price,
         stock,
+        imageUrl: imageUrl || null,
         userId,
         categoryId: categoryId || null,
       },
@@ -94,6 +96,7 @@ export class ProductsService {
     price?: number,
     stock?: number,
     categoryId?: number,
+    imageUrl?: string,
   ) {
     const product = await this.findOne(id);
 
@@ -122,6 +125,7 @@ export class ProductsService {
         description: description !== undefined ? description : product.description,
         price: price !== undefined ? price : product.price,
         stock: stock !== undefined ? stock : product.stock,
+        imageUrl: imageUrl !== undefined ? imageUrl : product.imageUrl,
         categoryId: categoryId !== undefined ? categoryId : product.categoryId,
       },
       include: {

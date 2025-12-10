@@ -34,6 +34,7 @@ export class ProductsController {
       createProductDto.price,
       createProductDto.stock,
       createProductDto.categoryId,
+      createProductDto.imageUrl,
     );
   }
 
@@ -72,6 +73,7 @@ export class ProductsController {
       updateProductDto.price,
       updateProductDto.stock,
       updateProductDto.categoryId,
+      updateProductDto.imageUrl,
     );
   }
 

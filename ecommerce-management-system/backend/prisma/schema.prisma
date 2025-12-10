@@ -49,6 +49,7 @@ model Product {
   description String?
   price       Float
   stock       Int      @default(0)
+  imageUrl    String?  // 商品图片URL
   userId      Int
   categoryId  Int?
   createdAt   DateTime @default(now())
