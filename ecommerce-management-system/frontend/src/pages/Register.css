@@ -10,7 +10,7 @@
 .register-background {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #8498ea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,7 +64,7 @@
 }
 
 .input-icon {
-  color: #662b7d;
+  color: #667eea;
 }
 
 .register-button {
