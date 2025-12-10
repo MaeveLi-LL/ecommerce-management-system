@@ -1,0 +1,70 @@
+{
+  "hash": "8625bdde",
+  "configHash": "5dc52577",
+  "lockfileHash": "b5c78f60",
+  "browserHash": "290a508e",
+  "optimized": {
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "bf42fc1b",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "4a62d0bd",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "a029ecd0",
+      "needsInterop": true
+    },
+    "antd": {
+      "src": "../../node_modules/antd/es/index.js",
+      "file": "antd.js",
+      "fileHash": "582bff7f",
+      "needsInterop": false
+    },
+    "antd/locale/zh_CN": {
+      "src": "../../node_modules/antd/locale/zh_CN.js",
+      "file": "antd_locale_zh_CN.js",
+      "fileHash": "d71f5cad",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "caacf707",
+      "needsInterop": false
+    },
+    "@ant-design/icons": {
+      "src": "../../node_modules/@ant-design/icons/es/index.js",
+      "file": "@ant-design_icons.js",
+      "fileHash": "83f3e6fe",
+      "needsInterop": false
+    },
+    "axios": {
+      "src": "../../node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "2e7a4679",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-TNTPHDQH": {
+      "file": "chunk-TNTPHDQH.js"
+    },
+    "chunk-HKKCYP37": {
+      "file": "chunk-HKKCYP37.js"
+    },
+    "chunk-32E4H3EV": {
+      "file": "chunk-32E4H3EV.js"
+    },
+    "chunk-G3PMV62Z": {
+      "file": "chunk-G3PMV62Z.js"
+    }
+  }
+}

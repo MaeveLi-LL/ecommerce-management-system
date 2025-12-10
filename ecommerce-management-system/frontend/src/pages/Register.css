@@ -1,0 +1,95 @@
+/* 注册页面样式文件 - 和登录页面样式类似 */
+
+.register-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-background {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.register-background::before {
+  content: '';
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  top: -250px;
+  right: -250px;
+}
+
+.register-background::after {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  bottom: -200px;
+  left: -200px;
+}
+
+.register-card-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 500px;
+  padding: 20px;
+}
+
+.register-card {
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: none;
+  overflow: hidden;
+}
+
+.register-title {
+  text-align: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.input-icon {
+  color: #667eea;
+}
+
+.register-button {
+  height: 45px;
+  font-size: 16px;
+  font-weight: 500;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.register-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.login-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.login-link:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}

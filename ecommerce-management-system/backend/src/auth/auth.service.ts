@@ -9,13 +9,13 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  // 验证用户（登录时使用）
+  // 验证用户名密码
   async validateUser(username: string, password: string): Promise<any> {
     const user = await this.usersService.validateUser(username, password);
     return user;
   }
 
-  // 登录，生成JWT token
+  // 登录成功后生成token
   async login(user: any) {
     const payload = { username: user.username, sub: user.id };
     return {
@@ -28,7 +28,7 @@ export class AuthService {
     };
   }
 
-  // 注册新用户
+  // 注册用户，注册成功后自动登录
   async register(username: string, email: string, password: string) {
     const user = await this.usersService.createUser(username, email, password);
     return this.login(user);

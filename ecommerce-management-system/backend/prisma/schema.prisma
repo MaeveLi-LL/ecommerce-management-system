@@ -1,5 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// 数据库模型定义文件
+// 用Prisma来管理数据库结构
 
 generator client {
   provider = "prisma-client-js"
@@ -10,6 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 用户表
 model User {
   id        Int      @id @default(autoincrement())
   username  String   @unique
@@ -18,40 +19,7 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  products Product[]
-
   @@map("users")
-}
-
-model Category {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  parentId  Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  parent   Category? @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children Category[] @relation("CategoryHierarchy")
-  products Product[]
-
-  @@map("categories")
-}
-
-model Product {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String?
-  price       Float
-  stock       Int      @default(0)
-  userId      Int
-  categoryId  Int?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category Category? @relation(fields: [categoryId], references: [id])
-
-  @@map("products")
 }
 
 

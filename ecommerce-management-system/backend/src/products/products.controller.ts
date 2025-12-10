@@ -19,7 +19,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
-  // 创建商品
+  // 添加新商品
   @Post()
   create(@Request() req, @Body() createProductDto: CreateProductDto) {
     return this.productsService.create(
@@ -32,20 +32,19 @@ export class ProductsController {
     );
   }
 
-  // 获取所有商品
+  // 获取商品列表（只显示当前用户的）
   @Get()
   findAll(@Request() req) {
-    // 只返回当前用户的商品
     return this.productsService.findAll(req.user.userId);
   }
 
-  // 根据ID获取商品
+  // 查看单个商品详情
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);
   }
 
-  // 更新商品
+  // 修改商品信息
   @Patch(':id')
   update(
     @Param('id') id: string,

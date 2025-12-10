@@ -1,0 +1,73 @@
+/* 商品管理页面样式 */
+
+.products-page {
+  padding: 0;
+}
+
+.products-card {
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* 页面头部，标题和添加按钮 */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 添加商品按钮，渐变背景 */
+.add-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  height: 40px;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+
+.add-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.products-table {
+  margin-top: 16px;
+}
+
+/* 价格显示为红色，突出显示 */
+.price-text {
+  color: #f5222d;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* 操作按钮（编辑、删除） */
+.action-button {
+  padding: 4px 8px;
+  transition: all 0.3s;
+}
+
+.action-button:hover {
+  transform: translateY(-1px);
+}
+
+/* 弹窗样式 */
+.product-modal .ant-modal-header {
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.product-modal .ant-modal-title {
+  font-size: 20px;
+  font-weight: 600;
+}

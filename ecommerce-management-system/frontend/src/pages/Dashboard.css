@@ -1,0 +1,95 @@
+/* Dashboard页面样式 */
+
+.dashboard-layout {
+  min-height: 100vh;
+}
+
+/* 左侧边栏，深色主题 */
+.dashboard-sider {
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Logo区域 */
+.logo-container {
+  height: 64px;
+  margin: 16px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+}
+
+.logo-container:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.logo-text {
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.dashboard-menu {
+  border-right: none;
+}
+
+/* 顶部导航栏，白色背景 */
+.dashboard-header {
+  background: #fff;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 折叠/展开侧边栏的按钮 */
+.collapse-button {
+  font-size: 18px;
+  width: 64px;
+  height: 64px;
+  transition: all 0.3s;
+}
+
+.collapse-button:hover {
+  background: #f0f0f0;
+}
+
+/* 右上角用户信息 */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.welcome-text {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+/* 用户头像，渐变背景 */
+.user-avatar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.user-avatar:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+/* 主内容区域 */
+.dashboard-content {
+  margin: 24px 16px;
+  padding: 24px;
+  min-height: 280px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}

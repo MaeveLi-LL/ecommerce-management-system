@@ -1,6 +1,9 @@
 version: '3.8'
 
+# Docker配置，用来启动PostgreSQL数据库和pgAdmin管理工具
+
 services:
+  # PostgreSQL数据库
   postgres:
     image: postgres:15
     container_name: ecommerce-postgres
@@ -16,6 +19,7 @@ services:
     networks:
       - ecommerce-network
 
+  # pgAdmin数据库管理工具（可选，方便查看数据库）
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: ecommerce-pgadmin

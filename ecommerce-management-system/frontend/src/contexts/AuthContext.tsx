@@ -26,7 +26,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    // 从localStorage恢复登录状态
+    // 页面刷新时，从本地存储恢复登录状态
     const savedToken = localStorage.getItem('token');
     const savedUser = localStorage.getItem('user');
     if (savedToken && savedUser) {

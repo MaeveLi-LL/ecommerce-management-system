@@ -6,9 +6,9 @@ import * as bcrypt from 'bcryptjs';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  // 创建新用户
+  // 创建用户
   async createUser(username: string, email: string, password: string) {
-    // 检查用户是否已存在
+    // 先检查用户名或邮箱是否已经被注册了
     const existingUser = await this.prisma.user.findFirst({
       where: {
         OR: [{ username }, { email }],
@@ -19,10 +19,10 @@ export class UsersService {
       throw new ConflictException('用户名或邮箱已存在');
     }
 
-    // 加密密码
+    // 密码加密存储，不能存明文
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 创建用户
+    // 保存到数据库
     const user = await this.prisma.user.create({
       data: {
         username,
@@ -31,22 +31,23 @@ export class UsersService {
       },
     });
 
-    // 返回用户信息（不包含密码）
+    // 返回时去掉密码字段，安全起见
     const { password: _, ...result } = user;
     return result;
   }
 
-  // 根据用户名查找用户
+  // 根据用户名找用户
   async findByUsername(username: string) {
     return this.prisma.user.findUnique({
       where: { username },
     });
   }
 
-  // 验证用户密码
+  // 验证用户名和密码是否正确
   async validateUser(username: string, password: string) {
     const user = await this.findByUsername(username);
     if (user && (await bcrypt.compare(password, user.password))) {
+      // 验证通过，返回用户信息（不含密码）
       const { password: _, ...result } = user;
       return result;
     }

@@ -8,14 +8,14 @@ import { LoginDto } from './dto/login.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  // 登录接口
+  // 用户登录
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req) {
     return this.authService.login(req.user);
   }
 
-  // 注册接口
+  // 用户注册
   @Post('register')
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(

@@ -5,10 +5,10 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
-  // 启用CORS，允许前端访问
+  // 允许前端跨域访问
   app.enableCors();
   
-  // 启用全局验证管道
+  // 全局数据验证
   app.useGlobalPipes(new ValidationPipe());
   
   await app.listen(3000);

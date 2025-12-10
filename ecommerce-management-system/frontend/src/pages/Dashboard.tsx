@@ -9,7 +9,8 @@ import {
 } from '@ant-design/icons';
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Outlet } from 'react-router-dom';
+import './Dashboard.css'; // 引入样式文件
 
 const { Header, Sider, Content } = Layout;
 
@@ -17,6 +18,14 @@ const Dashboard = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // 根据当前页面路径，高亮对应的菜单项
+  const getSelectedKey = () => {
+    if (location.pathname.includes('/products')) return '1';
+    if (location.pathname.includes('/categories')) return '2';
+    return '1';
+  };
 
   const userMenuItems = [
     {
@@ -30,82 +39,62 @@ const Dashboard = () => {
     },
   ];
 
+  const menuItems = [
+    {
+      key: '1',
+      icon: <ShoppingOutlined />,
+      label: '商品管理',
+      onClick: () => navigate('/products'),
+    },
+    {
+      key: '2',
+      icon: <AppstoreOutlined />,
+      label: '分类管理',
+      onClick: () => navigate('/categories'),
+    },
+  ];
+
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider trigger={null} collapsible collapsed={collapsed}>
-        <div
-          style={{
-            height: 32,
-            margin: 16,
-            background: 'rgba(255, 255, 255, 0.3)',
-            borderRadius: 6,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontWeight: 'bold',
-          }}
-        >
-          {collapsed ? '电商' : '电商管理系统'}
+    <Layout className="dashboard-layout">
+      <Sider 
+        trigger={null} 
+        collapsible 
+        collapsed={collapsed}
+        className="dashboard-sider"
+      >
+        <div className="logo-container">
+          <div className="logo-text">
+            {collapsed ? '电商' : '电商管理系统'}
+          </div>
         </div>
         <Menu
           theme="dark"
           mode="inline"
-          defaultSelectedKeys={['1']}
-          items={[
-            {
-              key: '1',
-              icon: <ShoppingOutlined />,
-              label: '商品管理',
-            },
-            {
-              key: '2',
-              icon: <AppstoreOutlined />,
-              label: '分类管理',
-            },
-          ]}
+          selectedKeys={[getSelectedKey()]}
+          items={menuItems}
+          className="dashboard-menu"
         />
       </Sider>
       <Layout>
-        <Header
-          style={{
-            padding: '0 24px',
-            background: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-          }}
-        >
+        <Header className="dashboard-header">
           <Button
             type="text"
             icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
             onClick={() => setCollapsed(!collapsed)}
-            style={{
-              fontSize: '16px',
-              width: 64,
-              height: 64,
-            }}
+            className="collapse-button"
           />
-          <Space>
-            <span>欢迎，{user?.username}</span>
+          <Space className="user-info">
+            <span className="welcome-text">欢迎，{user?.username}</span>
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
               <Avatar
-                style={{ backgroundColor: '#87d068', cursor: 'pointer' }}
+                className="user-avatar"
                 icon={<UserOutlined />}
               />
             </Dropdown>
           </Space>
         </Header>
-        <Content
-          style={{
-            margin: '24px 16px',
-            padding: 24,
-            minHeight: 280,
-            background: '#fff',
-          }}
-        >
-          <h1>欢迎使用电商商品管理系统</h1>
-          <p>请从左侧菜单选择功能</p>
+        <Content className="dashboard-content">
+          <Outlet />
         </Content>
       </Layout>
     </Layout>

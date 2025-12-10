@@ -7,7 +7,7 @@ export class CategoriesService {
 
   // 创建分类
   async create(name: string, parentId?: number) {
-    // 检查分类名称是否已存在
+    // 检查分类名是否重复
     const existing = await this.prisma.category.findUnique({
       where: { name },
     });
@@ -28,7 +28,7 @@ export class CategoriesService {
     });
   }
 
-  // 获取所有分类
+  // 获取所有分类列表
   async findAll() {
     return this.prisma.category.findMany({
       include: {
@@ -44,7 +44,7 @@ export class CategoriesService {
     });
   }
 
-  // 根据ID获取分类
+  // 根据ID查找单个分类
   async findOne(id: number) {
     const category = await this.prisma.category.findUnique({
       where: { id },
@@ -62,11 +62,11 @@ export class CategoriesService {
     return category;
   }
 
-  // 更新分类
+  // 更新分类信息
   async update(id: number, name?: string, parentId?: number) {
     const category = await this.findOne(id);
 
-    // 如果更新名称，检查是否重复
+    // 如果要改名字，先检查新名字是否已经被用了
     if (name && name !== category.name) {
       const existing = await this.prisma.category.findUnique({
         where: { name },
