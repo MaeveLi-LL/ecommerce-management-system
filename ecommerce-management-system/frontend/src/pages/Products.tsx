@@ -407,6 +407,7 @@ const Products = () => {
           loading={loading}
           pagination={{ pageSize: 10, showSizeChanger: true }}
           className="products-table"
+          locale={{ emptyText: 'No Data' }}
         />
       </Card>
 

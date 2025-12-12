@@ -180,6 +180,7 @@ const Categories = () => {
           loading={loading}
           pagination={{ pageSize: 10, showSizeChanger: true }}
           className="categories-table"
+          locale={{ emptyText: 'No Data' }}
         />
       </Card>
 
