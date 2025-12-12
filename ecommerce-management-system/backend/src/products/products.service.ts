@@ -28,26 +28,59 @@ export class ProductsService {
       }
     }
 
-    return this.prisma.product.create({
-      data: {
-        name,
-        description,
-        price,
-        stock,
-        imageUrl: imageUrl || null,
-        userId,
-        categoryId: categoryId || null,
-      },
-      include: {
-        category: true,
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
+    // Find the smallest available ID starting from 1
+    return await this.prisma.$transaction(async (tx) => {
+      // Get all existing IDs sorted
+      const existingIds = await tx.product.findMany({
+        select: { id: true },
+        orderBy: { id: 'asc' },
+      });
+
+      // Find the smallest available ID starting from 1
+      let nextId = 1;
+      for (const product of existingIds) {
+        if (product.id === nextId) {
+          nextId++;
+        } else {
+          // Found a gap, use this ID
+          break;
+        }
+      }
+
+      // Create with the calculated ID
+      const createdProduct = await tx.product.create({
+        data: {
+          id: nextId,
+          name,
+          description,
+          price,
+          stock,
+          imageUrl: imageUrl || null,
+          userId,
+          categoryId: categoryId || null,
+        },
+        include: {
+          category: true,
+          user: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+            },
           },
         },
-      },
+      });
+
+      // Update sequence to match the new max ID
+      const maxId = existingIds.length > 0 
+        ? Math.max(...existingIds.map(p => p.id), nextId)
+        : nextId;
+      
+      await tx.$executeRawUnsafe(
+        `SELECT setval('products_id_seq', ${maxId}, true)`
+      );
+
+      return createdProduct;
     });
   }
 

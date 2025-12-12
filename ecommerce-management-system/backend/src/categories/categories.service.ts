@@ -32,16 +32,49 @@ export class CategoriesService {
       }
     }
 
-    return this.prisma.category.create({
-      data: {
-        name,
-        userId,
-        parentId: parentId || null,
-      },
-      include: {
-        parent: true,
-        children: true,
-      },
+    // Find the smallest available ID starting from 1
+    return await this.prisma.$transaction(async (tx) => {
+      // Get all existing IDs sorted
+      const existingIds = await tx.category.findMany({
+        select: { id: true },
+        orderBy: { id: 'asc' },
+      });
+
+      // Find the smallest available ID starting from 1
+      let nextId = 1;
+      for (const category of existingIds) {
+        if (category.id === nextId) {
+          nextId++;
+        } else {
+          // Found a gap, use this ID
+          break;
+        }
+      }
+
+      // Create with the calculated ID
+      const createdCategory = await tx.category.create({
+        data: {
+          id: nextId,
+          name,
+          userId,
+          parentId: parentId || null,
+        },
+        include: {
+          parent: true,
+          children: true,
+        },
+      });
+
+      // Update sequence to match the new max ID
+      const maxId = existingIds.length > 0 
+        ? Math.max(...existingIds.map(c => c.id), nextId)
+        : nextId;
+      
+      await tx.$executeRawUnsafe(
+        `SELECT setval('categories_id_seq', ${maxId}, true)`
+      );
+
+      return createdCategory;
     });
   }
 
