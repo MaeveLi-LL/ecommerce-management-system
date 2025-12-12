@@ -16,11 +16,15 @@ import api from '../utils/api';
 import type { Category } from '../types';
 import './Categories.css';
 
+const { Search } = Input;
+
 const Categories = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [activeSearchKeyword, setActiveSearchKeyword] = useState('');
   const [form] = Form.useForm();
 
   // Fetch categories from backend
@@ -99,6 +103,28 @@ const Categories = () => {
     return parent?.name || '-';
   };
 
+  // Handle search - only filter when search button is clicked
+  const handleSearch = (value: string) => {
+    setActiveSearchKeyword(value);
+  };
+
+  // Filter categories based on active search keyword (only after clicking search button)
+  const filteredCategories = categories.filter((category) => {
+    if (!activeSearchKeyword) return true;
+    const keyword = activeSearchKeyword.toLowerCase();
+    const categoryName = category.name.toLowerCase();
+    const parentName = getParentName(category.parentId).toLowerCase();
+    const categoryId = category.id.toString();
+    const productCount = (category._count?.products || 0).toString();
+    
+    return (
+      categoryName.includes(keyword) ||
+      parentName.includes(keyword) ||
+      categoryId.includes(keyword) ||
+      productCount.includes(keyword)
+    );
+  });
+
   const columns = [
     {
       title: 'ID',
@@ -162,20 +188,36 @@ const Categories = () => {
       <Card className="categories-card">
         <div className="page-header">
           <h2 className="page-title">Category Management</h2>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => handleOpenModal()}
-            className="add-button"
-            size="large"
-          >
-            Create Category
-          </Button>
+          <Space>
+            <Search
+              placeholder="Search categories by name, parent, ID, or product count"
+              allowClear
+              enterButton
+              size="large"
+              style={{ width: 400 }}
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onSearch={handleSearch}
+              onClear={() => {
+                setSearchKeyword('');
+                setActiveSearchKeyword('');
+              }}
+            />
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => handleOpenModal()}
+              className="add-button"
+              size="large"
+            >
+              Create Category
+            </Button>
+          </Space>
         </div>
 
         <Table
           columns={columns}
-          dataSource={categories}
+          dataSource={filteredCategories}
           rowKey="id"
           loading={loading}
           pagination={{ pageSize: 10, showSizeChanger: true }}

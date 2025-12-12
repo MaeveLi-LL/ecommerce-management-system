@@ -9,7 +9,15 @@ async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   
   // 允许前端跨域访问
-  app.enableCors();
+  app.enableCors({
+    origin: ['http://localhost:3001', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+    exposedHeaders: ['Content-Length', 'Content-Type'],
+    credentials: true,
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  });
   
   // 全局数据验证
   app.useGlobalPipes(new ValidationPipe());
@@ -39,10 +47,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   
-  await app.listen(3000);
-  console.log('后端服务已启动，运行在 http://localhost:3000');
-  console.log('Swagger API 文档地址: http://localhost:3000/api');
-  console.log('静态文件服务: http://localhost:3000/uploads/');
+  await app.listen(3003);
+  console.log('后端服务已启动，运行在 http://localhost:3003');
+  console.log('Swagger API 文档地址: http://localhost:3003/api');
+  console.log('静态文件服务: http://localhost:3003/uploads/');
 }
 bootstrap();
 

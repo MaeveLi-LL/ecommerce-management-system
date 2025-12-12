@@ -21,7 +21,7 @@ import api from '../utils/api';
 import type { Product, Category } from '../types';
 import './Products.css';
 
-const { TextArea } = Input;
+const { TextArea, Search } = Input;
 
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -32,6 +32,8 @@ const Products = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [activeSearchKeyword, setActiveSearchKeyword] = useState('');
   const [form] = Form.useForm();
 
   // Fetch products from backend
@@ -96,7 +98,7 @@ const Products = () => {
             status: 'done',
             url: product.imageUrl.startsWith('http') 
               ? product.imageUrl 
-              : `http://localhost:3000${product.imageUrl}`,
+              : `http://localhost:3003${product.imageUrl}`,
           },
         ]);
       } else {
@@ -134,7 +136,7 @@ const Products = () => {
         throw new Error('Please login first');
       }
       
-      const response = await fetch('http://localhost:3000/upload/image', {
+      const response = await fetch('http://localhost:3003/upload/image', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -150,13 +152,13 @@ const Products = () => {
       const data = await response.json();
       console.log('Upload successful, response:', data);
       
-      // Update imageUrl in form (use relative path without http://localhost:3000)
+      // Update imageUrl in form (use relative path without http://localhost:3003)
       const imageUrlValue = data.url; // Backend returns /uploads/images/xxx.jpg
       form.setFieldsValue({ imageUrl: imageUrlValue });
       console.log('Set imageUrl to form:', imageUrlValue);
       
       // Update file list to success status, use server URL
-      const imageUrl = `http://localhost:3000${data.url}`;
+      const imageUrl = `http://localhost:3003${data.url}`;
       const successFile: UploadFile = {
         uid: fileUid,
         name: (file as File).name,
@@ -210,8 +212,8 @@ const Products = () => {
         
         // If not in form, extract URL from fileList
         if (file.url && file.status === 'done') {
-          // Remove http://localhost:3000 prefix, keep only relative path
-          imageUrl = file.url.replace('http://localhost:3000', '');
+          // Remove http://localhost:3003 prefix, keep only relative path
+          imageUrl = file.url.replace('http://localhost:3003', '');
           console.log('Extracted imageUrl from fileList:', imageUrl);
         } else if (file.response?.url) {
           // If url is in response
@@ -262,6 +264,39 @@ const Products = () => {
     }
   };
 
+  // Get category name by categoryId
+  const getCategoryName = (categoryId: number | null) => {
+    if (!categoryId) return '-';
+    const category = categories.find((cat) => cat.id === categoryId);
+    return category?.name || '-';
+  };
+
+  // Handle search - only filter when search button is clicked
+  const handleSearch = (value: string) => {
+    setActiveSearchKeyword(value);
+  };
+
+  // Filter products based on active search keyword (only after clicking search button)
+  const filteredProducts = products.filter((product) => {
+    if (!activeSearchKeyword) return true;
+    const keyword = activeSearchKeyword.toLowerCase();
+    const productName = product.name.toLowerCase();
+    const description = (product.description || '').toLowerCase();
+    const categoryName = getCategoryName(product.categoryId).toLowerCase();
+    const price = product.price.toString();
+    const stock = product.stock.toString();
+    const productId = product.id.toString();
+    
+    return (
+      productName.includes(keyword) ||
+      description.includes(keyword) ||
+      categoryName.includes(keyword) ||
+      price.includes(keyword) ||
+      stock.includes(keyword) ||
+      productId.includes(keyword)
+    );
+  });
+
   const columns = [
     {
       title: 'ID',
@@ -279,7 +314,7 @@ const Products = () => {
           // Handle image URL: if relative path, add server address
           const imageSrc = imageUrl.startsWith('http') 
             ? imageUrl 
-            : `http://localhost:3000${imageUrl}`;
+            : `http://localhost:3003${imageUrl}`;
           return (
             <Image
               src={imageSrc}
@@ -389,20 +424,36 @@ const Products = () => {
       <Card className="products-card">
         <div className="page-header">
           <h2 className="page-title">Product Management</h2>
-          <Button
-            type="primary"
-            icon={<PlusOutlined />}
-            onClick={() => handleOpenModal()}
-            className="add-button"
-            size="large"
-          >
-            Create Product
-          </Button>
+          <Space>
+            <Search
+              placeholder="Search products by name, description, category, price, stock, or ID"
+              allowClear
+              enterButton
+              size="large"
+              style={{ width: 450 }}
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onSearch={handleSearch}
+              onClear={() => {
+                setSearchKeyword('');
+                setActiveSearchKeyword('');
+              }}
+            />
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => handleOpenModal()}
+              className="add-button"
+              size="large"
+            >
+              Create Product
+            </Button>
+          </Space>
         </div>
 
         <Table
           columns={columns}
-          dataSource={products}
+          dataSource={filteredProducts}
           rowKey="id"
           loading={loading}
           pagination={{ pageSize: 10, showSizeChanger: true }}
@@ -622,7 +673,7 @@ const Products = () => {
                   <Image
                     src={detailProduct.imageUrl.startsWith('http') 
                       ? detailProduct.imageUrl 
-                      : `http://localhost:3000${detailProduct.imageUrl}`}
+                      : `http://localhost:3003${detailProduct.imageUrl}`}
                     alt="Product Image"
                     width={200}
                     style={{ borderRadius: 8 }}
