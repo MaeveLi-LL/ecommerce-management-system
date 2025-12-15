@@ -69,6 +69,49 @@
 
 ## ER 图
 
+### Mermaid 版（推荐：可在 Markdown 中渲染）
+
+```mermaid
+erDiagram
+  USERS ||--o{ PRODUCTS : owns
+  USERS ||--o{ CATEGORIES : owns
+  CATEGORIES ||--o{ PRODUCTS : contains
+  CATEGORIES ||--o{ CATEGORIES : parent_of
+
+  USERS {
+    Int id PK
+    String username "UNIQUE"
+    String email "UNIQUE"
+    String password "bcrypt hash"
+    DateTime createdAt
+    DateTime updatedAt
+  }
+
+  PRODUCTS {
+    Int id PK
+    String name
+    String description "nullable"
+    Float price
+    Int stock
+    String imageUrl "nullable"
+    Int userId FK
+    Int categoryId FK "nullable"
+    DateTime createdAt
+    DateTime updatedAt
+  }
+
+  CATEGORIES {
+    Int id PK
+    String name
+    Int userId FK
+    Int parentId FK "nullable (self)"
+    DateTime createdAt
+    DateTime updatedAt
+  }
+```
+
+### ASCII 版（备份/纯文本展示）
+
 ```
 ┌─────────────┐
 │    User     │

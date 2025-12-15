@@ -1,0 +1,44 @@
+// E-Commerce Management System - ER Diagram (DBML)
+// Import this file in drawDB: File -> Import -> DBML
+
+Table users {
+  id int [pk, increment]
+  username varchar [not null, unique]
+  email varchar [not null, unique]
+  password varchar [not null]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+}
+
+Table categories {
+  id int [pk, increment]
+  name varchar [not null]
+  userId int [not null]
+  parentId int
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+
+  Indexes {
+    (name, userId) [unique]
+  }
+}
+
+Table products {
+  id int [pk, increment]
+  name varchar [not null]
+  description text
+  price float [not null]
+  stock int [not null, default: 0]
+  imageUrl text
+  userId int [not null]
+  categoryId int
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+}
+
+Ref: products.userId > users.id
+Ref: categories.userId > users.id
+Ref: products.categoryId > categories.id
+Ref: categories.parentId > categories.id
+
+

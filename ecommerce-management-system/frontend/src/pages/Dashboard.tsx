@@ -1,5 +1,6 @@
 import { Layout, Menu, Button, Dropdown, Avatar, Space } from 'antd';
 import {
+  HomeOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   LogoutOutlined,
@@ -27,6 +28,7 @@ const Dashboard = () => {
 
   // 根据当前页面路径，高亮对应的菜单项
   const getSelectedKey = () => {
+    if (location.pathname === '/' || location.pathname.includes('/home')) return '0';
     if (location.pathname.includes('/products')) return '1';
     if (location.pathname.includes('/categories')) return '2';
     return '1';
@@ -83,6 +85,12 @@ const Dashboard = () => {
   ];
 
   const menuItems = [
+    {
+      key: '0',
+      icon: <HomeOutlined />,
+      label: 'Home',
+      onClick: () => navigate('/'),
+    },
     {
       key: '1',
       icon: <ShoppingOutlined />,

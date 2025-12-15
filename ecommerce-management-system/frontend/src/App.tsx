@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import Home from './pages/Home';
 import Products from './pages/Products';
 import Categories from './pages/Categories';
 import { AuthProvider } from './contexts/AuthContext';
@@ -25,7 +26,8 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Navigate to="/products" replace />} />
+            <Route index element={<Home />} />
+            <Route path="home" element={<Home />} />
             <Route path="products" element={<Products />} />
             <Route path="categories" element={<Categories />} />
           </Route>
